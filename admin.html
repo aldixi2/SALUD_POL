@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Actualizar datos — Convenio Salud POL</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#F5F6F7; --surface:#FFFFFF; --ink:#2B2B2C; --ink-soft:#63666A; --ink-faint:#9A9DA0;
+    --blue:#3E7AB8; --blue-deep:#285A8C; --gold:#C98A2E; --crimson:#C13B56; --line:#E1E4E6;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Arial,sans-serif;}
+  .wrap{max-width:760px;margin:0 auto;padding:36px 24px 70px;}
+  h1{font-size:24px;font-weight:600;margin:0 0 6px;}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 28px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:24px;margin-bottom:20px;}
+  .card h2{font-size:15px;margin:0 0 10px;}
+  .card p{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 14px;}
+  ol{font-size:13.5px;color:var(--ink-soft);line-height:1.7;padding-left:20px;margin:0;}
+  input[type=file]{display:block;width:100%;padding:14px;border:1.5px dashed var(--line);border-radius:6px;font-size:13.5px;background:var(--bg);}
+  .btn{font-size:14px;font-weight:600;color:#fff;background:var(--blue-deep);border:none;padding:12px 22px;border-radius:4px;cursor:pointer;margin-top:14px;}
+  .btn:hover{background:var(--blue);}
+  .btn:disabled{background:var(--ink-faint);cursor:not-allowed;}
+  .btn.secondary{background:var(--gold);}
+  .btn.secondary:hover{background:#b87a24;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px;}
+  td{padding:6px 4px;border-bottom:1px solid var(--line);}
+  td.k{color:var(--ink-soft);}
+  td.v{text-align:right;font-weight:600;}
+  #log{font-size:12.5px;color:var(--ink-soft);white-space:pre-wrap;margin-top:14px;max-height:160px;overflow:auto;background:var(--bg);border-radius:4px;padding:10px;}
+  .warn{color:var(--crimson);font-weight:600;}
+  .ok{color:#1a7a4a;}
+  #resultCard{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Actualizar datos del convenio</h1>
+  <p class="sub">Genera un nuevo <code>data.json</code> a partir del Excel actualizado, sin tocar el dashboard.</p>
+
+  <div class="card">
+    <h2>Cómo usarlo</h2>
+    <ol>
+      <li>Selecciona abajo el Excel actualizado (debe tener las hojas <b>CONSOLIDADO</b> y <b>Transferencias</b>, con las mismas columnas de siempre).</li>
+      <li>Presiona <b>"Procesar Excel"</b> y revisa el resumen que aparece.</li>
+      <li>Presiona <b>"Descargar data.json"</b>.</li>
+      <li>Reemplaza el archivo <code>data.json</code> de tu repositorio en GitHub por este nuevo archivo y súbelo (commit + push).</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>1. Selecciona el Excel</h2>
+    <input type="file" id="file" accept=".xlsx,.xls">
+    <button class="btn" id="btnProcess" disabled>Procesar Excel</button>
+    <div id="log"></div>
+  </div>
+
+  <div class="card" id="resultCard">
+    <h2>2. Resumen generado</h2>
+    <table id="resultTable"></table>
+    <button class="btn secondary" id="btnDownload">⬇ Descargar data.json</button>
+  </div>
+</div>
+
+<script>
+let workbookData = null;
+let generatedJson = null;
+
+document.getElementById('file').addEventListener('change', e=>{
+  document.getElementById('btnProcess').disabled = !e.target.files.length;
+});
+
+function log(msg, cls){
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  if(cls) line.className = cls;
+  line.textContent = msg;
+  el.appendChild(line);
+}
+function clearLog(){ document.getElementById('log').innerHTML=''; }
+
+function normHeader(s){
+  return String(s==null?'':s)
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/-/g,'')
+    .replace(/[^a-z0-9]+/g,' ')
+    .trim().replace(/\s+/g,' ');
+}
+
+function findExact(headersNorm, target){
+  return headersNorm.indexOf(target);
+}
+function findFallback(headersNorm, tests){
+  for(let i=0;i<headersNorm.length;i++){
+    if(tests.every(t=>headersNorm[i].includes(t))) return i;
+  }
+  return -1;
+}
+
+function resolveColumns(headersRaw, map, fallbacks){
+  const headersNorm = headersRaw.map(normHeader);
+  const idx = {};
+  for(const key in map){
+    let i = findExact(headersNorm, map[key]);
+    if(i===-1 && fallbacks[key]) i = findFallback(headersNorm, fallbacks[key]);
+    idx[key] = i;
+    if(i===-1) log('⚠ No se encontró la columna para "'+key+'" (se esperaba algo como "'+map[key]+'").', 'warn');
+    else log('✓ '+key+' → columna "'+headersRaw[i]+'"');
+  }
+  return idx;
+}
+
+function excelSerialToDate(v){
+  if(v instanceof Date) return v;
+  if(typeof v === 'number'){
+    const d = XLSX.SSF.parse_date_code(v);
+    if(d) return new Date(Date.UTC(d.y, d.m-1, d.d));
+  }
+  return null;
+}
+function fmtDateDMY(d){
+  if(!d) return '';
+  const dd = String(d.getUTCDate()).padStart(2,'0');
+  const mm = String(d.getUTCMonth()+1).padStart(2,'0');
+  return dd+'/'+mm+'/'+d.getUTCFullYear();
+}
+function toNum(v){
+  if(v==null || v==='') return 0;
+  if(typeof v === 'number') return v;
+  const n = parseFloat(String(v).replace(/,/g,''));
+  return isNaN(n) ? 0 : n;
+}
+
+document.getElementById('btnProcess').addEventListener('click', async ()=>{
+  clearLog();
+  document.getElementById('resultCard').style.display = 'none';
+  const file = document.getElementById('file').files[0];
+  if(!file) return;
+  log('Leyendo archivo…');
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, {type:'array', cellDates:true});
+
+  const sheetNames = wb.SheetNames;
+  const consolName = sheetNames.find(n => normHeader(n).includes('consolidado')) || sheetNames[0];
+  const transfName = sheetNames.find(n => normHeader(n).includes('transferencia'));
+  log('Hoja de atenciones detectada: "'+consolName+'"');
+  log(transfName ? ('Hoja de transferencias detectada: "'+transfName+'"') : '⚠ No se encontró hoja de Transferencias.', transfName?null:'warn');
+
+  // ---- CONSOLIDADO ----
+  const wsC = wb.Sheets[consolName];
+  const rowsC = XLSX.utils.sheet_to_json(wsC, {header:1, raw:true, defval:null});
+  const headersC = rowsC[0].map(h=>String(h==null?'':h));
+  const mapC = {
+    mesProduccion:'mes de produccion', documento:'documento de autorizacion', dni:'dni',
+    paciente:'nombre y apellido paciente', montoProced:'monto procedimientos', montoMedic:'monto medicamentos',
+    montoConforme:'monto conforme total', fechaFactura:'fecha factura', nroFactura:'nro factura',
+    montoFactura:'monto factura', mes:'mes', anio:'ano'
+  };
+  const fbC = {
+    mesProduccion:['produ'], documento:['documento'], montoProced:['procedi'], montoMedic:['medica'],
+    montoConforme:['conforme'], fechaFactura:['fecha','factura'], nroFactura:['nro','factura'],
+    montoFactura:['monto','factura'], paciente:['paciente']
+  };
+  log('--- Mapeo de columnas (atenciones) ---');
+  const idxC = resolveColumns(headersC, mapC, fbC);
+
+  const atenciones = [];
+  for(let r=1; r<rowsC.length; r++){
+    const row = rowsC[r];
+    if(!row) continue;
+    const dniVal = idxC.dni>-1 ? row[idxC.dni] : null;
+    if(dniVal==null || String(dniVal).trim()==='') continue; // fila de totales u otra vacía
+    const fFactRaw = idxC.fechaFactura>-1 ? row[idxC.fechaFactura] : null;
+    const fFact = excelSerialToDate(fFactRaw);
+    atenciones.push({
+      mesProduccion: idxC.mesProduccion>-1 ? String(row[idxC.mesProduccion]??'') : '',
+      documento: idxC.documento>-1 ? String(row[idxC.documento]??'') : '',
+      dni: String(dniVal),
+      paciente: idxC.paciente>-1 ? String(row[idxC.paciente]??'') : '',
+      montoProced: toNum(idxC.montoProced>-1?row[idxC.montoProced]:0),
+      montoMedic: toNum(idxC.montoMedic>-1?row[idxC.montoMedic]:0),
+      montoConforme: toNum(idxC.montoConforme>-1?row[idxC.montoConforme]:0),
+      fechaFactura: fmtDateDMY(fFact),
+      nroFactura: idxC.nroFactura>-1 ? String(row[idxC.nroFactura]??'') : '',
+      montoFactura: toNum(idxC.montoFactura>-1?row[idxC.montoFactura]:0),
+      mes: idxC.mes>-1 ? row[idxC.mes] : null,
+      anio: idxC.anio>-1 ? parseInt(row[idxC.anio]) : (fFact?fFact.getUTCFullYear():null)
+    });
+  }
+  log('Atenciones válidas procesadas: '+atenciones.length, 'ok');
+
+  // ---- Transferencias ----
+  let transferencias = [];
+  if(transfName){
+    const wsT = wb.Sheets[transfName];
+    const rowsT = XLSX.utils.sheet_to_json(wsT, {header:1, raw:true, defval:null});
+    const headersT = rowsT[0].map(h=>String(h==null?'':h));
+    const mapT = {n:'n', monto:'depositos', orden:'numero de orden'};
+    log('--- Mapeo de columnas (transferencias) ---');
+    const idxT = resolveColumns(headersT, mapT, {});
+    for(let r=1; r<rowsT.length; r++){
+      const row = rowsT[r];
+      if(!row) continue;
+      const nVal = idxT.n>-1 ? row[idxT.n] : null;
+      if(nVal==null || isNaN(parseInt(nVal))) continue;
+      transferencias.push({
+        n: parseInt(nVal),
+        monto: Math.round(toNum(idxT.monto>-1?row[idxT.monto]:0)*100)/100,
+        orden: String(idxT.orden>-1?row[idxT.orden]:'')
+      });
+    }
+    log('Transferencias válidas procesadas: '+transferencias.length, 'ok');
+  }
+  const transfTotal = Math.round(transferencias.reduce((s,t)=>s+t.monto,0)*100)/100;
+
+  // ---- Totales, mensual, anual ----
+  const totFactura = Math.round(atenciones.reduce((s,a)=>s+a.montoFactura,0)*100)/100;
+  const totProced = Math.round(atenciones.reduce((s,a)=>s+a.montoProced,0)*100)/100;
+  const totMedic = Math.round(atenciones.reduce((s,a)=>s+a.montoMedic,0)*100)/100;
+  const pacientes = new Set(atenciones.map(a=>a.dni)).size;
+  const pendiente = Math.round((totFactura-transfTotal)*100)/100;
+  const cobertura = totFactura ? Math.round((transfTotal/totFactura*100)*100)/100 : 0;
+
+  const mensualMap = {};
+  atenciones.forEach(a=>{
+    const m = String(a.mesProduccion).match(/(\d{1,2})[^\d]+(\d{4})/);
+    if(!m) return;
+    const key = m[2]+'-'+m[1].padStart(2,'0');
+    if(!mensualMap[key]) mensualMap[key] = {periodo:key, factura:0, proced:0, medic:0, n:0};
+    mensualMap[key].factura += a.montoFactura; mensualMap[key].proced += a.montoProced;
+    mensualMap[key].medic += a.montoMedic; mensualMap[key].n += 1;
+  });
+  const mensual = Object.values(mensualMap).sort((a,b)=>a.periodo.localeCompare(b.periodo))
+    .map(m=>({periodo:m.periodo, factura:Math.round(m.factura*100)/100, proced:Math.round(m.proced*100)/100, medic:Math.round(m.medic*100)/100, n:m.n}));
+
+  const anualMap = {};
+  atenciones.forEach(a=>{
+    const y = a.anio;
+    if(!y) return;
+    if(!anualMap[y]) anualMap[y] = {anio:y, factura:0, proced:0, medic:0, n:0, pacSet:new Set()};
+    anualMap[y].factura += a.montoFactura; anualMap[y].proced += a.montoProced;
+    anualMap[y].medic += a.montoMedic; anualMap[y].n += 1; anualMap[y].pacSet.add(a.dni);
+  });
+  const anual = Object.values(anualMap).sort((a,b)=>a.anio-b.anio).map(y=>({
+    anio:y.anio, factura:Math.round(y.factura*100)/100, proced:Math.round(y.proced*100)/100,
+    medic:Math.round(y.medic*100)/100, n:y.n, pacientes:y.pacSet.size
+  }));
+
+  generatedJson = {
+    generado: new Date().toLocaleString('es-PE'),
+    periodoMin: mensual.length?mensual[0].periodo:'',
+    periodoMax: mensual.length?mensual[mensual.length-1].periodo:'',
+    totales: {factura:totFactura, proced:totProced, medic:totMedic, atenciones:atenciones.length,
+      pacientes:pacientes, transferido:transfTotal, pendiente:pendiente, cobertura:cobertura},
+    mensual, anual, transferencias, atenciones
+  };
+
+  const tbl = document.getElementById('resultTable');
+  const rows = [
+    ['Atenciones procesadas', atenciones.length.toLocaleString('es-PE')],
+    ['Pacientes únicos', pacientes.toLocaleString('es-PE')],
+    ['Total facturado', 'S/ '+totFactura.toLocaleString('es-PE',{minimumFractionDigits:2})],
+    ['Total transferido', 'S/ '+transfTotal.toLocaleString('es-PE',{minimumFractionDigits:2})],
+    ['Cobertura', cobertura.toFixed(1)+'%'],
+    ['Periodo', (mensual[0]?.periodo||'—')+' a '+(mensual[mensual.length-1]?.periodo||'—')],
+  ];
+  tbl.innerHTML = rows.map(r=>'<tr><td class="k">'+r[0]+'</td><td class="v">'+r[1]+'</td></tr>').join('');
+  document.getElementById('resultCard').style.display = 'block';
+  log('Listo. Revisa el resumen y descarga el archivo.', 'ok');
+});
+
+document.getElementById('btnDownload').addEventListener('click', ()=>{
+  if(!generatedJson) return;
+  const blob = new Blob([JSON.stringify(generatedJson)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'data.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>

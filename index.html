@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Convenio Atenciones Salud POL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    box-sizing: border-box;
+    --bg: #F5F6F7; --surface: #FFFFFF; --ink: #2B2B2C; --ink-soft: #63666A; --ink-faint: #9A9DA0;
+    --blue: #3E7AB8; --blue-deep: #285A8C; --gold: #C98A2E; --crimson: #C13B56; --gray-dot: #63666A;
+    --line: #E1E4E6; --line-soft: #ECEEEF; --crimson-tint: rgba(193,59,86,0.14);
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17191B; --surface: #1F2225; --ink: #EDEEEF; --ink-soft: #AFB2B5; --ink-faint: #7C7F82;
+      --blue: #6DA3DA; --blue-deep: #4A87C4; --gold: #E0A83F; --crimson: #E0637C; --gray-dot: #9A9DA0;
+      --line: #313436; --line-soft: #26292B; --crimson-tint: rgba(224,99,124,0.16);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17191B; --surface: #1F2225; --ink: #EDEEEF; --ink-soft: #AFB2B5; --ink-faint: #7C7F82;
+    --blue: #6DA3DA; --blue-deep: #4A87C4; --gold: #E0A83F; --crimson: #E0637C; --gray-dot: #9A9DA0;
+    --line: #313436; --line-soft: #26292B; --crimson-tint: rgba(224,99,124,0.16);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: inherit; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Public Sans",-apple-system,"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width: 980px; margin:0 auto; padding:0 28px; }
+  .serif { font-family:"Fraunces","Iowan Old Style",Georgia,serif; }
+
+  header.top { border-bottom:1px solid var(--line); padding:30px 0 22px; display:flex; align-items:flex-start; gap:18px; }
+  header.top img.logo { width:52px; height:auto; flex-shrink:0; margin-top:2px; }
+  .tag { font-size:12.5px; color:var(--blue-deep); font-weight:700; letter-spacing:0.03em; text-transform:uppercase; }
+  h1.title { font-size:clamp(24px,4vw,32px); font-weight:500; margin:5px 0 8px; color:var(--ink); line-height:1.15; }
+  .period { color:var(--ink-soft); font-size:14.5px; margin:0; }
+
+  section.hero { padding:40px 0 8px; animation: rise 0.6s ease-out both; }
+  @media (prefers-reduced-motion: reduce) { section.hero { animation:none; } }
+  @keyframes rise { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .hero-amount { font-size:clamp(44px,8vw,74px); font-weight:500; line-height:1; margin:0; color:var(--ink); }
+  .hero-amount span { color:var(--blue); }
+  .hero-sub { color:var(--ink-soft); font-size:16px; margin:14px 0 0; max-width:52ch; }
+
+  .stat-strip { display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--line); margin-top:34px; }
+  @media (min-width:720px) { .stat-strip { grid-template-columns:repeat(6,1fr); } }
+  .stat { padding:18px 14px 18px 0; border-bottom:1px solid var(--line); }
+  .stat-val { font-family:"Fraunces",Georgia,serif; font-size:21px; font-weight:500; color:var(--ink); white-space:nowrap; }
+  .stat-lbl { font-size:12.5px; color:var(--ink-soft); margin-top:4px; line-height:1.3; }
+
+  section.block { padding:46px 0; border-top:1px solid var(--line); }
+  h2.h { font-size:20px; font-weight:600; margin:0 0 4px; color:var(--ink); }
+  p.lead { color:var(--ink-soft); font-size:14.5px; margin:0 0 22px; max-width:60ch; }
+
+  .chart-scroll { overflow-x:auto; padding-bottom:4px; }
+  .chart-inner { height:260px; }
+  .legend { display:flex; gap:22px; margin-top:14px; flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); }
+  .swatch { width:11px; height:11px; border-radius:2px; display:inline-block; }
+
+  .two-col { display:grid; grid-template-columns:1.3fr 1fr; gap:48px; }
+  @media (max-width:760px) { .two-col { grid-template-columns:1fr; gap:36px; } }
+
+  .donut-wrap { display:flex; align-items:center; gap:26px; flex-wrap:wrap; }
+  .donut-canvas-box { width:148px; height:148px; flex-shrink:0; position:relative; }
+  .donut-legend { display:flex; flex-direction:column; gap:12px; }
+  .dl-row { display:flex; align-items:baseline; gap:10px; }
+  .dl-pct { font-family:"Fraunces",Georgia,serif; font-size:22px; min-width:62px; }
+  .dl-text { font-size:13.5px; color:var(--ink-soft); }
+  .dl-text b { color:var(--ink); font-weight:600; }
+
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:11px 12px; border-bottom:1px solid var(--line-soft); }
+  th { color:var(--ink-soft); font-weight:600; font-size:12.5px; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  tfoot td { font-weight:700; border-top:1px solid var(--ink); border-bottom:none; color:var(--ink); }
+  .table-scroll { overflow-x:auto; }
+
+  .coverage { margin-top:26px; }
+  .coverage-bar { height:30px; border-radius:3px; background:var(--crimson-tint); overflow:hidden; display:flex; border:1px solid var(--line); }
+  .coverage-fill { background:var(--blue); height:100%; transition:width .6s ease; }
+  .coverage-labels { display:flex; justify-content:space-between; margin-top:8px; font-size:13px; color:var(--ink-soft); }
+  .coverage-labels b { color:var(--ink); }
+  .coverage-labels .pend b { color:var(--crimson); }
+
+  .download-box { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:20px 22px; }
+  .download-box .dtext { font-size:13.5px; color:var(--ink-soft); max-width:48ch; }
+  .download-box .dtext b { color:var(--ink); }
+  .btn { font-family:"Public Sans",sans-serif; font-size:14px; font-weight:600; color:#fff; background:var(--blue-deep); border:none; padding:12px 20px; border-radius:3px; cursor:pointer; white-space:nowrap; }
+  .btn:hover { background:var(--blue); }
+  .note { font-size:12px; color:var(--ink-faint); margin-top:10px; }
+
+  footer { border-top:1px solid var(--line); padding:26px 0 50px; }
+  footer p { color:var(--ink-faint); font-size:12.5px; margin:3px 0; }
+  #err-banner { display:none; background:var(--crimson-tint); border:1px solid var(--crimson); color:var(--ink); padding:14px 18px; border-radius:4px; margin:20px 0; font-size:13.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <img class="logo" alt="Unidad de Seguros Públicos y Privados" src="logo.png">
+    <div>
+      <div class="tag">Unidad de Seguros P&uacute;blicos y Privados</div>
+      <h1 class="title">Convenio de Atenci&oacute;n en Salud &mdash; POL</h1>
+      <p class="period" id="periodTxt">Cargando periodo&hellip;</p>
+    </div>
+  </header>
+
+  <div id="err-banner">No se pudo cargar <code>data.json</code>. Verifica que el archivo est&eacute; junto a index.html y que est&eacute;s viendo la p&aacute;gina desde un servidor (GitHub Pages) y no abriendo el archivo directamente.</div>
+
+  <section class="hero">
+    <p class="hero-amount serif">S/ <span id="heroAmount">&mdash;</span></p>
+    <p class="hero-sub" id="heroSub">Cargando datos del convenio&hellip;</p>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="stat-val" id="statAtenciones">&mdash;</div><div class="stat-lbl">Atenciones registradas</div></div>
+      <div class="stat"><div class="stat-val" id="statPacientes">&mdash;</div><div class="stat-lbl">Pacientes atendidos</div></div>
+      <div class="stat"><div class="stat-val" id="statProced">&mdash;</div><div class="stat-lbl">Monto en procedimientos</div></div>
+      <div class="stat"><div class="stat-val" id="statMedic">&mdash;</div><div class="stat-lbl">Monto en medicamentos</div></div>
+      <div class="stat"><div class="stat-val" id="statTransf">&mdash;</div><div class="stat-lbl">Total transferido</div></div>
+      <div class="stat"><div class="stat-val" id="statCobertura">&mdash;</div><div class="stat-lbl">Cobertura de transferencias</div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="h">Evoluci&oacute;n mensual del gasto</h2>
+    <p class="lead">Monto facturado por mes de producci&oacute;n, distribuido entre procedimientos y medicamentos.</p>
+    <div class="chart-scroll"><div class="chart-inner" id="monthlyBox"><canvas id="monthlyChart"></canvas></div></div>
+    <div class="legend">
+      <div class="legend-item"><span class="swatch" style="background:var(--blue)"></span>Procedimientos</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--gold)"></span>Medicamentos</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="two-col">
+      <div>
+        <h2 class="h">Comparativo anual</h2>
+        <p class="lead" id="yearlyLead">Monto facturado por a&ntilde;o.</p>
+        <div class="chart-inner" style="height:220px"><canvas id="yearlyChart"></canvas></div>
+      </div>
+      <div>
+        <h2 class="h">Procedimientos vs. medicamentos</h2>
+        <p class="lead">Distribuci&oacute;n del monto conforme total del convenio.</p>
+        <div class="donut-wrap">
+          <div class="donut-canvas-box"><canvas id="donutChart"></canvas></div>
+          <div class="donut-legend">
+            <div class="dl-row"><span class="dl-pct serif" style="color:var(--blue)" id="pctProced">&mdash;</span><span class="dl-text">Procedimientos<br><b id="montoProced">&mdash;</b></span></div>
+            <div class="dl-row"><span class="dl-pct serif" style="color:var(--gold)" id="pctMedic">&mdash;</span><span class="dl-text">Medicamentos<br><b id="montoMedic">&mdash;</b></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="h">Transferencias del convenio</h2>
+    <p class="lead">Dep&oacute;sitos recibidos frente al monto total facturado en el periodo.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>N&deg;</th><th class="num">Monto depositado</th><th>N&uacute;mero de orden</th></tr></thead>
+        <tbody id="transfRows"></tbody>
+        <tfoot><tr><td>Total</td><td class="num" id="transfTotal">&mdash;</td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <div class="coverage">
+      <div class="coverage-bar"><div class="coverage-fill" id="coverageFill" style="width:0%"></div></div>
+      <div class="coverage-labels">
+        <span>Transferido: <b id="covTransf">&mdash;</b></span>
+        <span class="pend">Pendiente: <b id="covPend">&mdash;</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="h">Lista de atenciones</h2>
+    <p class="lead">Detalle completo del convenio, tal como figura en el Excel de origen.</p>
+    <div class="download-box">
+      <div class="dtext">Exporta el listado completo (<b id="dlCount">&mdash;</b> atenciones) con paciente, DNI, montos y n&uacute;mero de factura, en formato CSV compatible con Excel.</div>
+      <button class="btn" id="btnCSV">&#11015; Descargar lista (CSV)</button>
+    </div>
+    <p class="note">Incluye datos personales de pacientes. Uso interno / administrativo.</p>
+  </section>
+
+  <footer>
+    <p>Unidad de Seguros P&uacute;blicos y Privados &middot; Fuente: Consolidado de atenciones del convenio de salud POL.</p>
+    <p id="footGen">Cifras en soles (S/). Panel generado a partir de <code>data.json</code>.</p>
+  </footer>
+
+</div>
+
+
+<script>
+const MESES_ABR = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',7:'Jul',8:'Ago',9:'Set',10:'Oct',11:'Nov',12:'Dic'};
+function fmtMoney(n){ return 'S/ ' + Number(n).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtInt(n){ return Number(n).toLocaleString('es-PE'); }
+function labelPeriodo(p){ const [y,m]=p.split('-').map(Number); return MESES_ABR[m]+" '"+String(y).slice(2); }
+function labelPeriodoFull(p){ const [y,m]=p.split('-').map(Number); return MESES_ABR[m]+' '+y; }
+
+async function getData(){
+  if (window.__DASHBOARD_DATA__) return window.__DASHBOARD_DATA__;
+  const res = await fetch('data.json', {cache:'no-store'});
+  if(!res.ok) throw new Error('fetch failed');
+  return await res.json();
+}
+
+function exportCSV(data){
+  const headers = ['Mes de producción','Documento de autorización','DNI','Paciente','Monto procedimientos','Monto medicamentos','Monto conforme total','Fecha factura','N° factura','Monto factura','Mes','Año'];
+  const keys = ['mesProduccion','documento','dni','paciente','montoProced','montoMedic','montoConforme','fechaFactura','nroFactura','montoFactura','mes','anio'];
+  const esc = v => '"' + String(v==null?'':v).replace(/"/g,'""') + '"';
+  const lines = [headers.map(esc).join(';')];
+  data.atenciones.forEach(r => lines.push(keys.map(k=>esc(r[k])).join(';')));
+  const csv = '\uFEFF' + lines.join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'atenciones_salud_pol.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function render(data){
+  const css = getComputedStyle(document.documentElement);
+  const C = {
+    blue: css.getPropertyValue('--blue').trim(),
+    gold: css.getPropertyValue('--gold').trim(),
+    ink: css.getPropertyValue('--ink').trim(),
+    inkSoft: css.getPropertyValue('--ink-soft').trim(),
+    line: css.getPropertyValue('--line').trim(),
+    bg: css.getPropertyValue('--bg').trim(),
+  };
+  const t = data.totales;
+
+  document.getElementById('periodTxt').textContent =
+    'Periodo de producci\u00f3n: ' + labelPeriodoFull(data.periodoMin) + ' \u2013 ' + labelPeriodoFull(data.periodoMax) + ' \u00b7 ' + data.mensual.length + ' meses registrados';
+  document.getElementById('heroAmount').textContent = fmtMoney(t.factura).replace('S/ ','');
+  document.getElementById('heroSub').textContent = 'facturados por el convenio en ' + fmtInt(t.atenciones) + ' atenciones a ' + fmtInt(t.pacientes) + ' pacientes, entre procedimientos y medicamentos conformados.';
+  document.getElementById('statAtenciones').textContent = fmtInt(t.atenciones);
+  document.getElementById('statPacientes').textContent = fmtInt(t.pacientes);
+  document.getElementById('statProced').textContent = 'S/ ' + Math.round(t.proced).toLocaleString('es-PE');
+  document.getElementById('statMedic').textContent = 'S/ ' + Math.round(t.medic).toLocaleString('es-PE');
+  document.getElementById('statTransf').textContent = 'S/ ' + Math.round(t.transferido).toLocaleString('es-PE');
+  document.getElementById('statCobertura').textContent = t.cobertura.toFixed(1) + '%';
+
+  // Monthly chart
+  const n = data.mensual.length;
+  document.getElementById('monthlyBox').style.width = Math.max(640, n*24) + 'px';
+  new Chart(document.getElementById('monthlyChart'), {
+    type:'bar',
+    data:{ labels: data.mensual.map(m=>labelPeriodo(m.periodo)),
+      datasets:[
+        {label:'Procedimientos', data:data.mensual.map(m=>m.proced), backgroundColor:C.blue, stack:'s', maxBarThickness:16},
+        {label:'Medicamentos', data:data.mensual.map(m=>m.medic), backgroundColor:C.gold, stack:'s', maxBarThickness:16}
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ x:{stacked:true, grid:{display:false}, ticks:{color:C.inkSoft, font:{size:9,family:'Public Sans'}, autoSkip:false, maxRotation:0}},
+               y:{stacked:true, grid:{color:C.line}, ticks:{color:C.inkSoft, font:{size:10,family:'Public Sans'}, callback:v=>'S/ '+v.toLocaleString('es-PE')}} },
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+fmtMoney(ctx.raw)}} } }
+  });
+
+  // Yearly chart
+  document.getElementById('yearlyLead').textContent = data.anual.some(y=>true) ? 'Los a\u00f1os en los extremos del rango pueden estar incompletos.' : '';
+  new Chart(document.getElementById('yearlyChart'), {
+    type:'bar',
+    data:{ labels: data.anual.map(y=>String(y.anio)),
+      datasets:[{label:'Facturado', data:data.anual.map(y=>y.factura), backgroundColor:C.blue, maxBarThickness:56}] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ x:{grid:{display:false}, ticks:{color:C.inkSoft, font:{size:11,family:'Public Sans'}}},
+               y:{grid:{color:C.line}, ticks:{color:C.inkSoft, font:{size:10,family:'Public Sans'}, callback:v=>'S/ '+v.toLocaleString('es-PE')}} },
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>fmtMoney(ctx.raw)}} } }
+  });
+
+  // Donut
+  document.getElementById('pctProced').textContent = (t.proced/t.factura*100).toFixed(1)+'%';
+  document.getElementById('pctMedic').textContent = (t.medic/t.factura*100).toFixed(1)+'%';
+  document.getElementById('montoProced').textContent = fmtMoney(t.proced);
+  document.getElementById('montoMedic').textContent = fmtMoney(t.medic);
+  new Chart(document.getElementById('donutChart'), {
+    type:'doughnut',
+    data:{ labels:['Procedimientos','Medicamentos'], datasets:[{data:[t.proced,t.medic], backgroundColor:[C.blue,C.gold], borderWidth:0}] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.label+': '+fmtMoney(ctx.raw)}} } }
+  });
+
+  // Transferencias
+  const tbody = document.getElementById('transfRows');
+  tbody.innerHTML = data.transferencias.map(r=>
+    '<tr><td>'+r.n+'</td><td class="num">'+fmtMoney(r.monto)+'</td><td>'+r.orden+'</td></tr>'
+  ).join('');
+  document.getElementById('transfTotal').textContent = fmtMoney(t.transferido);
+  document.getElementById('coverageFill').style.width = Math.min(100,t.cobertura) + '%';
+  document.getElementById('covTransf').textContent = fmtMoney(t.transferido) + ' (' + t.cobertura.toFixed(1) + '%)';
+  document.getElementById('covPend').textContent = fmtMoney(t.pendiente);
+
+  // Descarga
+  document.getElementById('dlCount').textContent = fmtInt(data.atenciones.length);
+  document.getElementById('btnCSV').addEventListener('click', ()=>exportCSV(data));
+
+  document.getElementById('footGen').textContent = 'Cifras en soles (S/). Datos actualizados: ' + data.generado + '.';
+}
+
+getData().then(render).catch(err=>{
+  document.getElementById('err-banner').style.display = 'block';
+  console.error(err);
+});
+</script>
+</body>
+</html>
