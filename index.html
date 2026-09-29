@@ -6,98 +6,118 @@
 <title>Convenio Atenciones Salud POL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
     box-sizing: border-box;
-    --bg: #F5F6F7; --surface: #FFFFFF; --ink: #2B2B2C; --ink-soft: #63666A; --ink-faint: #9A9DA0;
-    --blue: #3E7AB8; --blue-deep: #285A8C; --gold: #C98A2E; --crimson: #C13B56; --gray-dot: #63666A;
-    --line: #E1E4E6; --line-soft: #ECEEEF; --crimson-tint: rgba(193,59,86,0.14);
-    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #17191B; --surface: #1F2225; --ink: #EDEEEF; --ink-soft: #AFB2B5; --ink-faint: #7C7F82;
-      --blue: #6DA3DA; --blue-deep: #4A87C4; --gold: #E0A83F; --crimson: #E0637C; --gray-dot: #9A9DA0;
-      --line: #313436; --line-soft: #26292B; --crimson-tint: rgba(224,99,124,0.16);
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #17191B; --surface: #1F2225; --ink: #EDEEEF; --ink-soft: #AFB2B5; --ink-faint: #7C7F82;
-    --blue: #6DA3DA; --blue-deep: #4A87C4; --gold: #E0A83F; --crimson: #E0637C; --gray-dot: #9A9DA0;
-    --line: #313436; --line-soft: #26292B; --crimson-tint: rgba(224,99,124,0.16);
+    --bg: #F7F9FC;
+    --surface: #FFFFFF;
+    --tint: #EAF2FB;
+    --tint-line: #D6E6F7;
+    --ink: #243044;
+    --ink-soft: #5C6B7A;
+    --ink-faint: #93A1AF;
+    --blue: #2E86D8;
+    --blue-deep: #1D6BB8;
+    --gold: #EFA83C;
+    --gold-deep: #B87A24;
+    --crimson: #E0475F;
+    --crimson-tint: rgba(224,71,95,0.12);
+    --line: #E2E8F0;
+    --line-soft: #EEF2F6;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   * { box-sizing: inherit; }
   body { margin:0; background:var(--bg); color:var(--ink); font-family:"Public Sans",-apple-system,"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
-  .wrap { max-width: 980px; margin:0 auto; padding:0 28px; }
+  .wrap { max-width:1000px; margin:0 auto; padding:0 24px; }
   .serif { font-family:"Fraunces","Iowan Old Style",Georgia,serif; }
 
-  header.top { border-bottom:1px solid var(--line); padding:30px 0 22px; display:flex; align-items:flex-start; gap:18px; }
-  header.top img.logo { width:52px; height:auto; flex-shrink:0; margin-top:2px; }
+  header.top { padding:28px 0 6px; display:flex; align-items:flex-start; gap:16px; }
+  header.top img.logo { width:50px; height:auto; flex-shrink:0; margin-top:2px; }
   .tag { font-size:12.5px; color:var(--blue-deep); font-weight:700; letter-spacing:0.03em; text-transform:uppercase; }
-  h1.title { font-size:clamp(24px,4vw,32px); font-weight:500; margin:5px 0 8px; color:var(--ink); line-height:1.15; }
-  .period { color:var(--ink-soft); font-size:14.5px; margin:0; }
+  h1.title { font-size:clamp(23px,4vw,30px); font-weight:600; margin:5px 0 8px; color:var(--ink); line-height:1.2; }
+  .intro { color:var(--ink-soft); font-size:15px; line-height:1.55; margin:0 0 4px; max-width:62ch; }
+  .period { color:var(--ink-faint); font-size:13px; margin:6px 0 0; }
 
-  section.hero { padding:40px 0 8px; animation: rise 0.6s ease-out both; }
+  .filter-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:18px 0 4px; }
+  .filter-bar .fg { display:flex; align-items:center; gap:8px; }
+  .filter-bar label { font-size:13px; color:var(--ink-soft); font-weight:600; }
+  .filter-bar select {
+    font-family:"Public Sans",sans-serif; font-size:14px; font-weight:600; color:var(--ink);
+    padding:8px 30px 8px 12px; border:1.5px solid var(--line); border-radius:7px; background:var(--surface); cursor:pointer;
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%235C6B7A'/></svg>");
+    background-repeat:no-repeat; background-position:right 12px center;
+  }
+  .filter-bar select:focus { outline:2px solid var(--blue); outline-offset:1px; }
+  .filter-summary { font-size:13.5px; color:var(--blue-deep); font-weight:700; margin-left:auto; }
+
+  .hero-panel { background:var(--tint); border:1px solid var(--tint-line); border-radius:16px; padding:30px 28px 6px; margin:16px 0 38px; }
+  section.hero { padding:6px 0 0; animation: rise 0.5s ease-out both; }
   @media (prefers-reduced-motion: reduce) { section.hero { animation:none; } }
   @keyframes rise { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-  .hero-amount { font-size:clamp(44px,8vw,74px); font-weight:500; line-height:1; margin:0; color:var(--ink); }
-  .hero-amount span { color:var(--blue); }
-  .hero-sub { color:var(--ink-soft); font-size:16px; margin:14px 0 0; max-width:52ch; }
+  .hero-amount { font-size:clamp(40px,7.5vw,66px); font-weight:600; line-height:1; margin:0; color:var(--ink); }
+  .hero-amount span { color:var(--blue-deep); }
+  .hero-sub { color:var(--ink-soft); font-size:15.5px; margin:12px 0 0; max-width:56ch; }
 
-  .stat-strip { display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--line); margin-top:34px; }
-  @media (min-width:720px) { .stat-strip { grid-template-columns:repeat(6,1fr); } }
-  .stat { padding:18px 14px 18px 0; border-bottom:1px solid var(--line); }
-  .stat-val { font-family:"Fraunces",Georgia,serif; font-size:21px; font-weight:500; color:var(--ink); white-space:nowrap; }
+  .stat-strip { display:grid; grid-template-columns:repeat(2,1fr); border-top:1px solid var(--tint-line); margin-top:26px; }
+  @media (min-width:640px) { .stat-strip { grid-template-columns:repeat(3,1fr); } }
+  @media (min-width:900px) { .stat-strip { grid-template-columns:repeat(6,1fr); } }
+  .stat { padding:16px 14px 16px 0; border-bottom:1px solid var(--tint-line); }
+  .stat-icon { font-size:16px; margin-right:4px; }
+  .stat-val { font-family:"Fraunces",Georgia,serif; font-size:21px; font-weight:600; color:var(--ink); white-space:nowrap; }
   .stat-lbl { font-size:12.5px; color:var(--ink-soft); margin-top:4px; line-height:1.3; }
 
-  section.block { padding:46px 0; border-top:1px solid var(--line); }
-  h2.h { font-size:20px; font-weight:600; margin:0 0 4px; color:var(--ink); }
-  p.lead { color:var(--ink-soft); font-size:14.5px; margin:0 0 22px; max-width:60ch; }
+  section.block { padding:38px 0; border-top:1px solid var(--line); }
+  h2.h { font-size:19px; font-weight:700; margin:0 0 5px; color:var(--ink); }
+  p.lead { color:var(--ink-soft); font-size:14.5px; margin:0 0 20px; max-width:62ch; line-height:1.5; }
 
   .chart-scroll { overflow-x:auto; padding-bottom:4px; }
-  .chart-inner { height:260px; }
+  .chart-inner { height:250px; }
   .legend { display:flex; gap:22px; margin-top:14px; flex-wrap:wrap; }
-  .legend-item { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); }
-  .swatch { width:11px; height:11px; border-radius:2px; display:inline-block; }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--ink-soft); }
+  .swatch { width:11px; height:11px; border-radius:3px; display:inline-block; }
 
-  .two-col { display:grid; grid-template-columns:1.3fr 1fr; gap:48px; }
-  @media (max-width:760px) { .two-col { grid-template-columns:1fr; gap:36px; } }
+  .two-col { display:grid; grid-template-columns:1.3fr 1fr; gap:44px; }
+  @media (max-width:760px) { .two-col { grid-template-columns:1fr; gap:34px; } }
 
-  .donut-wrap { display:flex; align-items:center; gap:26px; flex-wrap:wrap; }
-  .donut-canvas-box { width:148px; height:148px; flex-shrink:0; position:relative; }
+  .donut-wrap { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+  .donut-canvas-box { width:140px; height:140px; flex-shrink:0; position:relative; }
   .donut-legend { display:flex; flex-direction:column; gap:12px; }
   .dl-row { display:flex; align-items:baseline; gap:10px; }
-  .dl-pct { font-family:"Fraunces",Georgia,serif; font-size:22px; min-width:62px; }
+  .dl-pct { font-family:"Fraunces",Georgia,serif; font-size:21px; min-width:60px; }
   .dl-text { font-size:13.5px; color:var(--ink-soft); }
-  .dl-text b { color:var(--ink); font-weight:600; }
+  .dl-text b { color:var(--ink); font-weight:700; }
+
+  .empty-note { font-size:14px; color:var(--ink-faint); padding:20px 0; }
 
   table { width:100%; border-collapse:collapse; font-size:14px; }
   th, td { text-align:left; padding:11px 12px; border-bottom:1px solid var(--line-soft); }
-  th { color:var(--ink-soft); font-weight:600; font-size:12.5px; }
+  th { color:var(--ink-soft); font-weight:700; font-size:12.5px; }
   td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
-  tfoot td { font-weight:700; border-top:1px solid var(--ink); border-bottom:none; color:var(--ink); }
+  tfoot td { font-weight:700; border-top:1.5px solid var(--ink); border-bottom:none; color:var(--ink); }
   .table-scroll { overflow-x:auto; }
 
-  .coverage { margin-top:26px; }
-  .coverage-bar { height:30px; border-radius:3px; background:var(--crimson-tint); overflow:hidden; display:flex; border:1px solid var(--line); }
+  .coverage { margin-top:24px; }
+  .coverage-bar { height:28px; border-radius:6px; background:var(--crimson-tint); overflow:hidden; display:flex; border:1px solid var(--line); }
   .coverage-fill { background:var(--blue); height:100%; transition:width .6s ease; }
   .coverage-labels { display:flex; justify-content:space-between; margin-top:8px; font-size:13px; color:var(--ink-soft); }
   .coverage-labels b { color:var(--ink); }
   .coverage-labels .pend b { color:var(--crimson); }
 
-  .download-box { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:20px 22px; }
-  .download-box .dtext { font-size:13.5px; color:var(--ink-soft); max-width:48ch; }
+  .download-box { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:22px; }
+  .download-box .dtext { font-size:14px; color:var(--ink-soft); max-width:48ch; line-height:1.5; }
   .download-box .dtext b { color:var(--ink); }
-  .btn { font-family:"Public Sans",sans-serif; font-size:14px; font-weight:600; color:#fff; background:var(--blue-deep); border:none; padding:12px 20px; border-radius:3px; cursor:pointer; white-space:nowrap; }
+  .btn { font-family:"Public Sans",sans-serif; font-size:14.5px; font-weight:700; color:#fff; background:var(--blue-deep); border:none; padding:13px 22px; border-radius:8px; cursor:pointer; white-space:nowrap; }
   .btn:hover { background:var(--blue); }
   .note { font-size:12px; color:var(--ink-faint); margin-top:10px; }
 
-  footer { border-top:1px solid var(--line); padding:26px 0 50px; }
+  footer { border-top:1px solid var(--line); padding:24px 0 50px; }
   footer p { color:var(--ink-faint); font-size:12.5px; margin:3px 0; }
-  #err-banner { display:none; background:var(--crimson-tint); border:1px solid var(--crimson); color:var(--ink); padding:14px 18px; border-radius:4px; margin:20px 0; font-size:13.5px; }
+  #err-banner { display:none; background:var(--crimson-tint); border:1px solid var(--crimson); color:var(--ink); padding:14px 18px; border-radius:8px; margin:20px 0; font-size:13.5px; }
 </style>
 </head>
 <body>
@@ -108,29 +128,42 @@
     <div>
       <div class="tag">Unidad de Seguros P&uacute;blicos y Privados</div>
       <h1 class="title">Convenio de Atenci&oacute;n en Salud &mdash; POL</h1>
+      <p class="intro">Panel informativo para personal policial y m&eacute;dico: cu&aacute;nto se ha atendido, en qu&eacute; se gast&oacute; (procedimientos o medicinas) y si las transferencias cubren lo facturado.</p>
       <p class="period" id="periodTxt">Cargando periodo&hellip;</p>
     </div>
   </header>
 
-  <div id="err-banner">No se pudo cargar <code>data.json</code>. Verifica que el archivo est&eacute; junto a index.html y que est&eacute;s viendo la p&aacute;gina desde un servidor (GitHub Pages) y no abriendo el archivo directamente.</div>
-
-  <section class="hero">
-    <p class="hero-amount serif">S/ <span id="heroAmount">&mdash;</span></p>
-    <p class="hero-sub" id="heroSub">Cargando datos del convenio&hellip;</p>
-
-    <div class="stat-strip">
-      <div class="stat"><div class="stat-val" id="statAtenciones">&mdash;</div><div class="stat-lbl">Atenciones registradas</div></div>
-      <div class="stat"><div class="stat-val" id="statPacientes">&mdash;</div><div class="stat-lbl">Pacientes atendidos</div></div>
-      <div class="stat"><div class="stat-val" id="statProced">&mdash;</div><div class="stat-lbl">Monto en procedimientos</div></div>
-      <div class="stat"><div class="stat-val" id="statMedic">&mdash;</div><div class="stat-lbl">Monto en medicamentos</div></div>
-      <div class="stat"><div class="stat-val" id="statTransf">&mdash;</div><div class="stat-lbl">Total transferido</div></div>
-      <div class="stat"><div class="stat-val" id="statCobertura">&mdash;</div><div class="stat-lbl">Cobertura de transferencias</div></div>
+  <div class="filter-bar">
+    <div class="fg"><label for="selAnio">A&ntilde;o</label>
+      <select id="selAnio"><option value="todos">Todos</option></select>
     </div>
-  </section>
+    <div class="fg"><label for="selMes">Mes</label>
+      <select id="selMes"><option value="todos">Todos</option></select>
+    </div>
+    <span class="filter-summary" id="filterSummary"></span>
+  </div>
+
+  <div id="err-banner">No se pudo cargar <code>data.json</code>. Verifica que el archivo est&eacute; junto a index.html y que est&eacute;s viendo la p&aacute;gina desde un servidor (GitHub Pages), no abriendo el archivo directamente.</div>
+
+  <div class="hero-panel">
+    <section class="hero">
+      <p class="hero-amount serif">S/ <span id="heroAmount">&mdash;</span></p>
+      <p class="hero-sub" id="heroSub">Cargando datos del convenio&hellip;</p>
+
+      <div class="stat-strip">
+        <div class="stat"><div class="stat-val"><span class="stat-icon">🩺</span><span id="statAtenciones">&mdash;</span></div><div class="stat-lbl">Atenciones registradas</div></div>
+        <div class="stat"><div class="stat-val"><span class="stat-icon">👥</span><span id="statPacientes">&mdash;</span></div><div class="stat-lbl">Pacientes atendidos</div></div>
+        <div class="stat"><div class="stat-val"><span class="stat-icon">🏥</span><span id="statProced">&mdash;</span></div><div class="stat-lbl">Gastado en procedimientos</div></div>
+        <div class="stat"><div class="stat-val"><span class="stat-icon">💊</span><span id="statMedic">&mdash;</span></div><div class="stat-lbl">Gastado en medicamentos</div></div>
+        <div class="stat"><div class="stat-val"><span class="stat-icon">🏦</span><span id="statTransf">&mdash;</span></div><div class="stat-lbl">Total transferido (convenio)</div></div>
+        <div class="stat"><div class="stat-val"><span class="stat-icon">✅</span><span id="statCobertura">&mdash;</span></div><div class="stat-lbl">Cobertura de transferencias</div></div>
+      </div>
+    </section>
+  </div>
 
   <section class="block">
-    <h2 class="h">Evoluci&oacute;n mensual del gasto</h2>
-    <p class="lead">Monto facturado por mes de producci&oacute;n, distribuido entre procedimientos y medicamentos.</p>
+    <h2 class="h">📈 Evoluci&oacute;n mensual del gasto</h2>
+    <p class="lead">Cu&aacute;nto se factur&oacute; cada mes, separado entre procedimientos (azul) y medicamentos (dorado). Cambia el a&ntilde;o o el mes arriba para ver un periodo espec&iacute;fico.</p>
     <div class="chart-scroll"><div class="chart-inner" id="monthlyBox"><canvas id="monthlyChart"></canvas></div></div>
     <div class="legend">
       <div class="legend-item"><span class="swatch" style="background:var(--blue)"></span>Procedimientos</div>
@@ -138,21 +171,21 @@
     </div>
   </section>
 
-  <section class="block">
+  <section class="block" id="yearlyBlock">
     <div class="two-col">
       <div>
-        <h2 class="h">Comparativo anual</h2>
-        <p class="lead" id="yearlyLead">Monto facturado por a&ntilde;o.</p>
-        <div class="chart-inner" style="height:220px"><canvas id="yearlyChart"></canvas></div>
+        <h2 class="h">📊 Comparativo anual</h2>
+        <p class="lead" id="yearlyLead">Monto facturado por a&ntilde;o. Selecciona "Todos" en el filtro de A&ntilde;o para verlo.</p>
+        <div id="yearlyChartWrap"><div class="chart-inner" style="height:210px"><canvas id="yearlyChart"></canvas></div></div>
       </div>
       <div>
-        <h2 class="h">Procedimientos vs. medicamentos</h2>
-        <p class="lead">Distribuci&oacute;n del monto conforme total del convenio.</p>
+        <h2 class="h">🧾 Procedimientos vs. medicamentos</h2>
+        <p class="lead">De cada sol facturado, cu&aacute;nto fue por procedimientos y cu&aacute;nto por medicinas.</p>
         <div class="donut-wrap">
           <div class="donut-canvas-box"><canvas id="donutChart"></canvas></div>
           <div class="donut-legend">
             <div class="dl-row"><span class="dl-pct serif" style="color:var(--blue)" id="pctProced">&mdash;</span><span class="dl-text">Procedimientos<br><b id="montoProced">&mdash;</b></span></div>
-            <div class="dl-row"><span class="dl-pct serif" style="color:var(--gold)" id="pctMedic">&mdash;</span><span class="dl-text">Medicamentos<br><b id="montoMedic">&mdash;</b></span></div>
+            <div class="dl-row"><span class="dl-pct serif" style="color:var(--gold-deep)" id="pctMedic">&mdash;</span><span class="dl-text">Medicamentos<br><b id="montoMedic">&mdash;</b></span></div>
           </div>
         </div>
       </div>
@@ -160,8 +193,8 @@
   </section>
 
   <section class="block">
-    <h2 class="h">Transferencias del convenio</h2>
-    <p class="lead">Dep&oacute;sitos recibidos frente al monto total facturado en el periodo.</p>
+    <h2 class="h">💰 Transferencias del convenio</h2>
+    <p class="lead">Dep&oacute;sitos recibidos para pagar todo el convenio, frente al total facturado en todo el periodo. Esta secci&oacute;n no cambia con los filtros de arriba, porque los dep&oacute;sitos no est&aacute;n divididos por mes.</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th>N&deg;</th><th class="num">Monto depositado</th><th>N&uacute;mero de orden</th></tr></thead>
@@ -179,11 +212,11 @@
   </section>
 
   <section class="block">
-    <h2 class="h">Lista de atenciones</h2>
-    <p class="lead">Detalle completo del convenio, tal como figura en el Excel de origen.</p>
+    <h2 class="h">📋 Lista de atenciones</h2>
+    <p class="lead">Detalle completo del convenio, tal como figura en el Excel de origen. Respeta los filtros de a&ntilde;o y mes que elijas arriba.</p>
     <div class="download-box">
-      <div class="dtext">Exporta el listado completo (<b id="dlCount">&mdash;</b> atenciones) con paciente, DNI, montos y n&uacute;mero de factura, en formato CSV compatible con Excel.</div>
-      <button class="btn" id="btnCSV">&#11015; Descargar lista (CSV)</button>
+      <div class="dtext">Exporta el listado que est&aacute;s viendo (<b id="dlCount">&mdash;</b> atenciones) con paciente, DNI, montos y n&uacute;mero de factura, en un archivo que abre directo en Excel.</div>
+      <button class="btn" id="btnCSV">⬇ Descargar lista (CSV)</button>
     </div>
     <p class="note">Incluye datos personales de pacientes. Uso interno / administrativo.</p>
   </section>
@@ -198,10 +231,14 @@
 
 <script>
 const MESES_ABR = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',7:'Jul',8:'Ago',9:'Set',10:'Oct',11:'Nov',12:'Dic'};
+const MESES_FULL = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Setiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
 function fmtMoney(n){ return 'S/ ' + Number(n).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function fmtInt(n){ return Number(n).toLocaleString('es-PE'); }
-function labelPeriodo(p){ const [y,m]=p.split('-').map(Number); return MESES_ABR[m]+" '"+String(y).slice(2); }
-function labelPeriodoFull(p){ const [y,m]=p.split('-').map(Number); return MESES_ABR[m]+' '+y; }
+function periodoMesNum(p){ return parseInt(p.split('-')[1],10); }
+function periodoAnio(p){ return parseInt(p.split('-')[0],10); }
+function labelPeriodo(p){ return MESES_ABR[periodoMesNum(p)]+" '"+String(periodoAnio(p)).slice(2); }
+function labelPeriodoFull(p){ return MESES_ABR[periodoMesNum(p)]+' '+periodoAnio(p); }
+function mesNumFromAtencion(a){ const m = String(a.mesProduccion).match(/^(\d{1,2})/); return m?parseInt(m[1],10):null; }
 
 async function getData(){
   if (window.__DASHBOARD_DATA__) return window.__DASHBOARD_DATA__;
@@ -210,12 +247,12 @@ async function getData(){
   return await res.json();
 }
 
-function exportCSV(data){
+function exportCSV(list){
   const headers = ['Mes de producción','Documento de autorización','DNI','Paciente','Monto procedimientos','Monto medicamentos','Monto conforme total','Fecha factura','N° factura','Monto factura','Mes','Año'];
   const keys = ['mesProduccion','documento','dni','paciente','montoProced','montoMedic','montoConforme','fechaFactura','nroFactura','montoFactura','mes','anio'];
   const esc = v => '"' + String(v==null?'':v).replace(/"/g,'""') + '"';
   const lines = [headers.map(esc).join(';')];
-  data.atenciones.forEach(r => lines.push(keys.map(k=>esc(r[k])).join(';')));
+  list.forEach(r => lines.push(keys.map(k=>esc(r[k])).join(';')));
   const csv = '\uFEFF' + lines.join('\r\n');
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -225,87 +262,161 @@ function exportCSV(data){
   URL.revokeObjectURL(url);
 }
 
-function render(data){
+function groupByPeriodo(list){
+  const map = {};
+  list.forEach(a=>{
+    const p = a.mesProduccion && a.mesProduccion.match(/^\d{1,2}-\d{4}$/) ? (a.anio+'-'+String(mesNumFromAtencion(a)).padStart(2,'0')) : null;
+    if(!p) return;
+    if(!map[p]) map[p] = {periodo:p, factura:0, proced:0, medic:0, n:0};
+    map[p].factura += a.montoFactura; map[p].proced += a.montoProced; map[p].medic += a.montoMedic; map[p].n += 1;
+  });
+  return Object.values(map).sort((a,b)=>a.periodo.localeCompare(b.periodo));
+}
+function groupByAnio(list){
+  const map = {};
+  list.forEach(a=>{
+    if(!a.anio) return;
+    if(!map[a.anio]) map[a.anio] = {anio:a.anio, factura:0, proced:0, medic:0, n:0};
+    map[a.anio].factura += a.montoFactura; map[a.anio].proced += a.montoProced; map[a.anio].medic += a.montoMedic; map[a.anio].n += 1;
+  });
+  return Object.values(map).sort((a,b)=>a.anio-b.anio);
+}
+
+let CHARTS = {monthly:null, yearly:null, donut:null};
+let DATA = null;
+
+function getFiltered(){
+  const y = document.getElementById('selAnio').value;
+  const m = document.getElementById('selMes').value;
+  return DATA.atenciones.filter(a=>{
+    if(y!=='todos' && String(a.anio)!==y) return false;
+    if(m!=='todos' && mesNumFromAtencion(a)!==parseInt(m,10)) return false;
+    return true;
+  });
+}
+
+function renderAll(){
   const css = getComputedStyle(document.documentElement);
-  const C = {
-    blue: css.getPropertyValue('--blue').trim(),
-    gold: css.getPropertyValue('--gold').trim(),
-    ink: css.getPropertyValue('--ink').trim(),
-    inkSoft: css.getPropertyValue('--ink-soft').trim(),
-    line: css.getPropertyValue('--line').trim(),
-    bg: css.getPropertyValue('--bg').trim(),
-  };
-  const t = data.totales;
+  const C = { blue:css.getPropertyValue('--blue').trim(), gold:css.getPropertyValue('--gold').trim(),
+    ink:css.getPropertyValue('--ink').trim(), inkSoft:css.getPropertyValue('--ink-soft').trim(), line:css.getPropertyValue('--line').trim() };
 
-  document.getElementById('periodTxt').textContent =
-    'Periodo de producci\u00f3n: ' + labelPeriodoFull(data.periodoMin) + ' \u2013 ' + labelPeriodoFull(data.periodoMax) + ' \u00b7 ' + data.mensual.length + ' meses registrados';
-  document.getElementById('heroAmount').textContent = fmtMoney(t.factura).replace('S/ ','');
-  document.getElementById('heroSub').textContent = 'facturados por el convenio en ' + fmtInt(t.atenciones) + ' atenciones a ' + fmtInt(t.pacientes) + ' pacientes, entre procedimientos y medicamentos conformados.';
-  document.getElementById('statAtenciones').textContent = fmtInt(t.atenciones);
-  document.getElementById('statPacientes').textContent = fmtInt(t.pacientes);
-  document.getElementById('statProced').textContent = 'S/ ' + Math.round(t.proced).toLocaleString('es-PE');
-  document.getElementById('statMedic').textContent = 'S/ ' + Math.round(t.medic).toLocaleString('es-PE');
-  document.getElementById('statTransf').textContent = 'S/ ' + Math.round(t.transferido).toLocaleString('es-PE');
-  document.getElementById('statCobertura').textContent = t.cobertura.toFixed(1) + '%';
+  const filtered = getFiltered();
+  const agg = filtered.reduce((s,a)=>{ s.factura+=a.montoFactura; s.proced+=a.montoProced; s.medic+=a.montoMedic; s.dni.add(a.dni); return s; },
+    {factura:0, proced:0, medic:0, dni:new Set()});
+  const nAt = filtered.length;
+  const nPac = agg.dni.size;
 
-  // Monthly chart
-  const n = data.mensual.length;
-  document.getElementById('monthlyBox').style.width = Math.max(640, n*24) + 'px';
-  new Chart(document.getElementById('monthlyChart'), {
-    type:'bar',
-    data:{ labels: data.mensual.map(m=>labelPeriodo(m.periodo)),
-      datasets:[
-        {label:'Procedimientos', data:data.mensual.map(m=>m.proced), backgroundColor:C.blue, stack:'s', maxBarThickness:16},
-        {label:'Medicamentos', data:data.mensual.map(m=>m.medic), backgroundColor:C.gold, stack:'s', maxBarThickness:16}
-      ]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      scales:{ x:{stacked:true, grid:{display:false}, ticks:{color:C.inkSoft, font:{size:9,family:'Public Sans'}, autoSkip:false, maxRotation:0}},
-               y:{stacked:true, grid:{color:C.line}, ticks:{color:C.inkSoft, font:{size:10,family:'Public Sans'}, callback:v=>'S/ '+v.toLocaleString('es-PE')}} },
-      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+fmtMoney(ctx.raw)}} } }
-  });
+  // resumen de filtro
+  const yVal = document.getElementById('selAnio').value;
+  const mVal = document.getElementById('selMes').value;
+  let resumen = 'Mostrando: todo el periodo';
+  if(yVal!=='todos' && mVal!=='todos') resumen = 'Mostrando: '+MESES_FULL[parseInt(mVal)]+' '+yVal;
+  else if(yVal!=='todos') resumen = 'Mostrando: a\u00f1o '+yVal;
+  else if(mVal!=='todos') resumen = 'Mostrando: '+MESES_FULL[parseInt(mVal)]+' (todos los a\u00f1os)';
+  document.getElementById('filterSummary').textContent = resumen;
 
-  // Yearly chart
-  document.getElementById('yearlyLead').textContent = data.anual.some(y=>true) ? 'Los a\u00f1os en los extremos del rango pueden estar incompletos.' : '';
-  new Chart(document.getElementById('yearlyChart'), {
-    type:'bar',
-    data:{ labels: data.anual.map(y=>String(y.anio)),
-      datasets:[{label:'Facturado', data:data.anual.map(y=>y.factura), backgroundColor:C.blue, maxBarThickness:56}] },
-    options:{ responsive:true, maintainAspectRatio:false,
-      scales:{ x:{grid:{display:false}, ticks:{color:C.inkSoft, font:{size:11,family:'Public Sans'}}},
-               y:{grid:{color:C.line}, ticks:{color:C.inkSoft, font:{size:10,family:'Public Sans'}, callback:v=>'S/ '+v.toLocaleString('es-PE')}} },
-      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>fmtMoney(ctx.raw)}} } }
-  });
+  document.getElementById('heroAmount').textContent = agg.factura.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('heroSub').textContent = 'facturados en '+fmtInt(nAt)+' atenciones a '+fmtInt(nPac)+' pacientes'+(yVal==='todos'&&mVal==='todos' ? ', en todo el periodo del convenio.' : ', en el periodo seleccionado.');
+  document.getElementById('statAtenciones').textContent = fmtInt(nAt);
+  document.getElementById('statPacientes').textContent = fmtInt(nPac);
+  document.getElementById('statProced').textContent = 'S/ '+Math.round(agg.proced).toLocaleString('es-PE');
+  document.getElementById('statMedic').textContent = 'S/ '+Math.round(agg.medic).toLocaleString('es-PE');
+  document.getElementById('statTransf').textContent = 'S/ '+Math.round(DATA.totales.transferido).toLocaleString('es-PE');
+  document.getElementById('statCobertura').textContent = DATA.totales.cobertura.toFixed(1)+'%';
 
-  // Donut
-  document.getElementById('pctProced').textContent = (t.proced/t.factura*100).toFixed(1)+'%';
-  document.getElementById('pctMedic').textContent = (t.medic/t.factura*100).toFixed(1)+'%';
-  document.getElementById('montoProced').textContent = fmtMoney(t.proced);
-  document.getElementById('montoMedic').textContent = fmtMoney(t.medic);
-  new Chart(document.getElementById('donutChart'), {
+  // Monthly chart (siempre según filtro)
+  const mensual = groupByPeriodo(filtered);
+  const n = Math.max(mensual.length,1);
+  document.getElementById('monthlyBox').style.width = Math.max(560, n*(n>15?24:56)) + 'px';
+  if(CHARTS.monthly) CHARTS.monthly.destroy();
+  if(mensual.length===0){
+    document.getElementById('monthlyBox').innerHTML = '<p class="empty-note">No hay atenciones para este filtro.</p>';
+  } else {
+    if(!document.getElementById('monthlyChart')){
+      document.getElementById('monthlyBox').innerHTML = '<canvas id="monthlyChart"></canvas>';
+    }
+    CHARTS.monthly = new Chart(document.getElementById('monthlyChart'), {
+      type:'bar',
+      data:{ labels: mensual.map(m=>labelPeriodo(m.periodo)),
+        datasets:[
+          {label:'Procedimientos', data:mensual.map(m=>m.proced), backgroundColor:C.blue, stack:'s', maxBarThickness:36, borderRadius:3},
+          {label:'Medicamentos', data:mensual.map(m=>m.medic), backgroundColor:C.gold, stack:'s', maxBarThickness:36, borderRadius:3}
+        ]},
+      options:{ responsive:true, maintainAspectRatio:false,
+        scales:{ x:{stacked:true, grid:{display:false}, ticks:{color:C.inkSoft, font:{size:10,family:'Public Sans'}, autoSkip:false, maxRotation:0}},
+                 y:{stacked:true, grid:{color:C.line}, ticks:{color:C.inkSoft, font:{size:10,family:'Public Sans'}, callback:v=>'S/ '+v.toLocaleString('es-PE')}} },
+        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+fmtMoney(ctx.raw)}} } }
+    });
+  }
+
+  // Yearly chart: siempre se recalcula según el filtro activo (año y/o mes)
+  const yearlyBlock = document.getElementById('yearlyChartWrap');
+  const yearlyLead = document.getElementById('yearlyLead');
+  const anual = groupByAnio(filtered);
+  yearlyLead.textContent = 'Monto facturado por a\u00f1o' + (mVal!=='todos' ? ' en '+MESES_FULL[parseInt(mVal)] : '') + (anual.length>1 ? '. Los a\u00f1os en los extremos del rango pueden estar incompletos.' : '.');
+  if(CHARTS.yearly) CHARTS.yearly.destroy();
+  if(!document.getElementById('yearlyChart')){ yearlyBlock.innerHTML = '<div class="chart-inner" style="height:210px"><canvas id="yearlyChart"></canvas></div>'; }
+  if(anual.length===0){
+    yearlyBlock.innerHTML = '<p class="empty-note">No hay atenciones para este filtro.</p>';
+  } else {
+    CHARTS.yearly = new Chart(document.getElementById('yearlyChart'), {
+      type:'bar',
+      data:{ labels: anual.map(y=>String(y.anio)),
+        datasets:[{label:'Facturado', data:anual.map(y=>y.factura), backgroundColor:C.blue, maxBarThickness:54, borderRadius:4}] },
+      options:{ responsive:true, maintainAspectRatio:false,
+        scales:{ x:{grid:{display:false}, ticks:{color:C.inkSoft, font:{size:11,family:'Public Sans'}}},
+                 y:{grid:{color:C.line}, ticks:{color:C.inkSoft, font:{size:10,family:'Public Sans'}, callback:v=>'S/ '+v.toLocaleString('es-PE')}} },
+        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>fmtMoney(ctx.raw)}} } }
+    });
+  }
+
+  // Donut (según filtro)
+  const pctP = agg.factura ? (agg.proced/agg.factura*100) : 0;
+  const pctM = agg.factura ? (agg.medic/agg.factura*100) : 0;
+  document.getElementById('pctProced').textContent = pctP.toFixed(1)+'%';
+  document.getElementById('pctMedic').textContent = pctM.toFixed(1)+'%';
+  document.getElementById('montoProced').textContent = fmtMoney(agg.proced);
+  document.getElementById('montoMedic').textContent = fmtMoney(agg.medic);
+  if(CHARTS.donut) CHARTS.donut.destroy();
+  CHARTS.donut = new Chart(document.getElementById('donutChart'), {
     type:'doughnut',
-    data:{ labels:['Procedimientos','Medicamentos'], datasets:[{data:[t.proced,t.medic], backgroundColor:[C.blue,C.gold], borderWidth:0}] },
+    data:{ labels:['Procedimientos','Medicamentos'], datasets:[{data:[agg.proced,agg.medic], backgroundColor:[C.blue,C.gold], borderWidth:0}] },
     options:{ responsive:true, maintainAspectRatio:false, cutout:'68%',
       plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.label+': '+fmtMoney(ctx.raw)}} } }
   });
 
-  // Transferencias
-  const tbody = document.getElementById('transfRows');
-  tbody.innerHTML = data.transferencias.map(r=>
-    '<tr><td>'+r.n+'</td><td class="num">'+fmtMoney(r.monto)+'</td><td>'+r.orden+'</td></tr>'
-  ).join('');
-  document.getElementById('transfTotal').textContent = fmtMoney(t.transferido);
-  document.getElementById('coverageFill').style.width = Math.min(100,t.cobertura) + '%';
-  document.getElementById('covTransf').textContent = fmtMoney(t.transferido) + ' (' + t.cobertura.toFixed(1) + '%)';
-  document.getElementById('covPend').textContent = fmtMoney(t.pendiente);
-
-  // Descarga
-  document.getElementById('dlCount').textContent = fmtInt(data.atenciones.length);
-  document.getElementById('btnCSV').addEventListener('click', ()=>exportCSV(data));
-
-  document.getElementById('footGen').textContent = 'Cifras en soles (S/). Datos actualizados: ' + data.generado + '.';
+  // Transferencias (global, no cambia con filtro)
+  document.getElementById('dlCount').textContent = fmtInt(nAt);
+  document.getElementById('btnCSV').onclick = ()=>exportCSV(filtered);
 }
 
-getData().then(render).catch(err=>{
+function renderStatic(data){
+  document.getElementById('periodTxt').textContent =
+    'Datos disponibles: ' + labelPeriodoFull(data.periodoMin) + ' \u2013 ' + labelPeriodoFull(data.periodoMax) + ' \u00b7 ' + data.mensual.length + ' meses registrados';
+
+  const selAnio = document.getElementById('selAnio');
+  data.anual.forEach(y=>{ const o=document.createElement('option'); o.value=String(y.anio); o.textContent=String(y.anio); selAnio.appendChild(o); });
+
+  const selMes = document.getElementById('selMes');
+  for(let i=1;i<=12;i++){ const o=document.createElement('option'); o.value=String(i); o.textContent=MESES_FULL[i]; selMes.appendChild(o); }
+
+  const tbody = document.getElementById('transfRows');
+  tbody.innerHTML = data.transferencias.map(r=>'<tr><td>'+r.n+'</td><td class="num">'+fmtMoney(r.monto)+'</td><td>'+r.orden+'</td></tr>').join('');
+  document.getElementById('transfTotal').textContent = fmtMoney(data.totales.transferido);
+  document.getElementById('coverageFill').style.width = Math.min(100,data.totales.cobertura) + '%';
+  document.getElementById('covTransf').textContent = fmtMoney(data.totales.transferido) + ' (' + data.totales.cobertura.toFixed(1) + '%)';
+  document.getElementById('covPend').textContent = fmtMoney(data.totales.pendiente);
+  document.getElementById('footGen').textContent = 'Cifras en soles (S/). Datos actualizados: ' + data.generado + '.';
+
+  selAnio.addEventListener('change', renderAll);
+  selMes.addEventListener('change', renderAll);
+}
+
+getData().then(data=>{
+  DATA = data;
+  renderStatic(data);
+  renderAll();
+}).catch(err=>{
   document.getElementById('err-banner').style.display = 'block';
   console.error(err);
 });
